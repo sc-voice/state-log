@@ -1,0 +1,35 @@
+{
+  "name": "@sc-voice/state-log",
+  "version": "0.0.0",
+  "description": "Compressed state logger",
+  "main": "index.js",
+  "private": false,
+  "directories": {},
+  "dependencies": {
+    "merkle-json": "^2.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.0.0",
+    "should": "^13.2.3"
+  },
+  "scripts": {
+    "version": "scripts/version.sh",
+    "build": "scripts/build-dist.sh",
+    "test": "npm run test:verbose",
+    "test:test": "mocha --config test/mocha-config.json -g TESTTEST",
+    "test:verbose": "mocha --inline-diffs",
+    "test:one": "mocha --inline-diffs -g TESTTEST",
+    "test:watch": "mocha -w --inline-diffs"
+  },
+  "repository": {
+    "tag": "git"
+  },
+  "bin": {},
+  "keywords": [
+    "Merkle compression",
+    "JSON state logging"
+  ],
+  "author": "Karl Lew",
+  "homepage": "https://github.com/sc-voice/state-log",
+  "license": "MIT"
+}
