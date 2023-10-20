@@ -1,0 +1,13 @@
+{
+  "reporter": "min",
+  "inline-diffs": true,
+  "glob": [ "TEST" ],
+  "watch": true,
+  "parallel": true,
+  "watch-ignore": [
+    "node_modules",
+    ".git",
+    "linode",
+    "local"
+  ]
+}

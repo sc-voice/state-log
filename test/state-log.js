@@ -1,6 +1,6 @@
 import should from "should";
 import { MerkleJson } from "merkle-json/index.js"
-import StateLog from '../src/state-log.mjs';
+import { StateLog } from '../index.js';
 
 typeof describe === "function" && describe("state-log", ()=>{
   let ml = new MerkleJson();
@@ -203,5 +203,15 @@ typeof describe === "function" && describe("state-log", ()=>{
       ['initial', 'x','x','y', 'z']);
     should.deepEqual(sl.stateHistory(5), 
       ['z','z','z','z','z']);
+  });
+  it("TESTTESTnormalizeState()", ()=>{
+    let date = JSON.stringify(new Date()).replace(/"/g,'');
+    let keepMinutes = "[-T0-9]+:[0-9]+";
+    let re = new RegExp(keepMinutes);
+    let [ match, index ] = date.match(re);
+    should(re.test(date)).equal(true);
+    let expected = date.split(/:[.0-9]*Z$/)[0];
+    should(match).equal(expected);
+    //console.log({date, match, expected});
   });
 })

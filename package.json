@@ -1,14 +1,25 @@
 {
   "name": "@sc-voice/state-log",
+  "type": "module",
   "version": "0.0.0",
   "description": "Compressed state logger",
-  "main": "index.js",
+  "exports": "./index.js",
+  "engines": ">=16",
   "private": false,
   "directories": {},
   "dependencies": {
+    "log-instance": "^1.5.0",
     "merkle-json": "^2.6.0"
   },
+  "files": [
+    "index.js",
+    "node.js",
+    "LICENSE",
+    "src/"
+  ],
+  "license": "MIT",
   "devDependencies": {
+    "jsdoc": "^4.0.2",
     "mocha": "^10.0.0",
     "should": "^13.2.3"
   },
