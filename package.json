@@ -1,7 +1,7 @@
 {
   "name": "@sc-voice/state-log",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Compressed state logger",
   "exports": "./index.js",
   "engines": ">=16",
@@ -24,7 +24,6 @@
     "should": "^13.2.3"
   },
   "scripts": {
-    "version": "scripts/version.sh",
     "build": "scripts/build-dist.sh",
     "test": "npm run test:verbose",
     "test:test": "mocha --config test/mocha-config.json -g TESTTEST",
@@ -41,6 +40,5 @@
     "JSON state logging"
   ],
   "author": "Karl Lew",
-  "homepage": "https://github.com/sc-voice/state-log",
-  "license": "MIT"
+  "homepage": "https://github.com/sc-voice/state-log"
 }
