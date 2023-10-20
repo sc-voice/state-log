@@ -1,7 +1,7 @@
 {
   "name": "@sc-voice/state-log",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Compressed state logger",
   "exports": "./index.js",
   "engines": ">=16",
