@@ -33,7 +33,7 @@ export class Monitor {
   }
 
   /**
-   * Start monitor
+   * Start monitor. Currently this can only be called once
    */
   start() {
     const msg = CLASS+'.#start()';
