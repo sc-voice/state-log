@@ -29,7 +29,8 @@
     "test:test": "mocha --config test/mocha-config.json -g TESTTEST",
     "test:verbose": "mocha --inline-diffs",
     "test:one": "mocha --inline-diffs -g TESTTEST",
-    "test:watch": "mocha -w --inline-diffs"
+    "test:watch": "mocha -w --inline-diffs",
+    "test:url": "node scripts/test-url.js"
   },
   "repository": {
     "tag": "git"

@@ -21,43 +21,48 @@ export class Monitor {
     let {
       interval = TIMER_INTERVAL, // milliseconds
     } = opts;
-
-    this.#start(interval);
+    logger.logInstance(this);
 
     Object.defineProperty(this, "probes", {
       value: [],
     });
     
-    Object.assign(this, {
-      interval,
+    Object.defineProperty(this, "interval", {
+      value: interval,
     });
   }
 
   /**
-   * Stop monitoring and free up all resources.
+   * Start monitor
    */
-  terminate() { 
-    const msg = CLASS+'.clear()';
-    let { interval } = this;
-    let timer = timers[interval];
-    if (timer) {
-      logger.info(msg, `shutting down monitor@${interval}`);
-      clearInterval(timer);
-    }
-    logger.info(msg, 'monitor@${interval} is inactive');
-  }
-
-  #start(interval=TIMER_INTERVAL) {
+  start() {
     const msg = CLASS+'.#start()';
+    let { interval } = this;
     let timer = timers[interval];
     if (timer ) {
       let emsg = `${msg} existing Monitor @ ${interval}ms`;
       throw new Error(emsg);
     }
+    this.started = new Date();
     timers[interval] = setInterval(()=>{ 
       this.#timerHandler(); 
     }, interval);
-    logger.info(msg, `@ ${interval/1000}s`);
+    this.info(msg, `@ ${interval/1000}s`);
+  }
+
+  /**
+   * Stop monitoring and free up all resources.
+   */
+  stop() { 
+    const msg = CLASS+'.clear()';
+    let { interval } = this;
+    let timer = timers[interval];
+    if (timer) {
+      this.info(msg, `shutting down monitor@${interval}`);
+      clearInterval(timer);
+      timers[interval] = undefined;
+    }
+    this.info(msg, 'monitor@${interval} is inactive');
   }
 
   #timerHandler() {
@@ -75,7 +80,7 @@ export class Monitor {
       let { jsonFilter, stateLog, url } = probes[i];
       fetch(url).then(res=>{
         let { status } = res;
-        if (jsonFilter) {
+        if (jsonFilter !== undefined) {
           res.json().then(json=>{
             json = StateLog.normalizeState(json, jsonFilter);
             let state = { status, json, };
@@ -92,10 +97,10 @@ export class Monitor {
   /**
    * Add a probe to monitor the given url
    * @param {url} url - resource to monitor
-   * @param {StateLogProperties} jsonFilter - expect JSON response (see properties for StateLog.normalizeState()). If omitted, just record the status code.
+   * @param {StateLogProperties} jsonFilter - expect JSON response (see properties for StateLog.normalizeState()). If omitted, just record the status code. If null, record entire state.
    */
-  monitorUrl(opts={}) {
-    const msg = CLASS+'.monitorUrl() ';
+  probeUrl(opts={}) {
+    const msg = CLASS+'.probeUrl() ';
     let { probes, interval } = this;
     let {
       url,
@@ -113,7 +118,7 @@ export class Monitor {
       jsonFilter,
     };
     probes.push(probe);
-    logger.info(msg, url);
+    this.info(msg, url);
 
     return probe;
   }
