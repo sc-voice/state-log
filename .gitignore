@@ -1,6 +1,7 @@
 *.deb
 *.wiki
 wiki
+out
 local
 archive
 .eslint*
