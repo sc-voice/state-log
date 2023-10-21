@@ -8,6 +8,7 @@ export class StateLog {
    * Create a StateLog for a given interval.
    * Create a StateLog from its serialized JSON representation.
    * @param {milliseconds} interval - REQUIRED: sampling period in millisecods (default 1000)
+   * @param {StateLogProperties} properties - see normalizeState() 
    * @param {Date} date - JSON: current sample date
    * @param {JSON} state - JSON: sample state
    * @param {array} history - JSON: past states
@@ -15,17 +16,18 @@ export class StateLog {
    * @param {numberOfIntervals} age - JSON: state duration
    */
   constructor(opts={}) {
+    const msg = 'StateLog.ctor()';
     if (typeof opts === 'string') {
       opts = JSON.parse(opts);
     }
     let { 
       interval=1000, 
-      date=Date.now(), 
+      date=new Date(),
       state, 
       history,
       hash,
       age=1,
-      properties={},
+      properties,
     } = opts;
 
     if (history == null) {
@@ -33,6 +35,11 @@ export class StateLog {
     }
     if (typeof date === 'string') {
       date = new Date(date);
+    }
+
+    if (properties && Object.keys(properties).length===0) {
+      let eMsg = `${msg} properties argument has no keys`;
+      throw new Error(eMsg);
     }
 
     let ml = new MerkleJson();
@@ -44,6 +51,54 @@ export class StateLog {
     Object.assign(this, {
       interval, date, state, history, hash, age, properties,
     });
+  }
+
+  /**
+   * Normalize given state for storage.
+   * Normalization can remove unwanted properties.
+   * Normalization can also trim property values. 
+   * @param {serializable} state - raw state to be normalized
+   * @param {StateLogProperties} properties - normalization parameters. 
+   * @returns {serializable} normalized object
+   *
+   * If properties.xyz is true, that property is included.
+   * If properties.xyz is a string, 
+   * the string is converted to a regular expression and
+   * the state value of that property is stripped of 
+   * anything that does not matchthat regular expression.
+   * If properties.xyz is anything else an Error is thrown.
+   * If properties is null, the entire state is left as is.
+   */
+  static normalizeState(state, properties) {
+    const msg = `StateLog.normalizeState()`;
+
+    if (properties == null) {
+      return state; 
+    }
+
+    if (typeof state === "object") {
+      let normalized = {};
+      Object.entries(properties).forEach(entry=>{
+        let [ key, value ] = entry;
+        let stateValue = state[key];
+
+        if (value === true) {
+          normalized[key] = stateValue;
+        } else if (typeof value === 'string') {
+          let re = new RegExp(value);
+          if (stateValue != null) {
+            let match = stateValue.match(re);
+            normalized[key] = match ? match[0] : 'no-match';
+          }
+        } else {
+          let emsg = `${msg} cannot normalize "${key}"`;
+          console.log({entry, value, key, normalized});
+          throw new Error(emsg);
+        }
+      });
+      state = normalized;
+    }
+    return state;
   }
 
   /**
@@ -62,7 +117,7 @@ export class StateLog {
   update(newState, newDate=new Date()) {
     const msg = 'StateLog.update() ';
     let { interval, age, ml, hash, date, properties } = this;
-    let state = this.normalizeState(newState, properties);
+    let state = StateLog.normalizeState(newState, properties);
     let newHash = ml.hash(state);
     if (newDate < date) {
       let emsg = `${msg} newDate must be after ${date}`;
@@ -86,26 +141,6 @@ export class StateLog {
     this.date = newDate;
 
     return this;
-  }
-
-  /**
-   * Normalize given state for storage.
-   * Normalization can remove unwanted properties.
-   * Normalization can also trim property values. 
-   * @param {serializable} state - raw state to be normalized
-   * @param {object} properties - normalization parameters. 
-   * @returns {serializable} normalized object
-   *
-   * If properties.xyz is true, that property is included.
-   * If properties.xyz is a string, 
-   * the string is converted to a regular expression and
-   * the state value of that property is stripped of 
-   * anything that does not matchthat regular expression.
-   */
-  normalizeState(state, properties=this.properties) {
-    if (typeof state === "object") {
-    }
-    return state;
   }
 
   /**

@@ -2,13 +2,15 @@ import should from "should";
 import { MerkleJson } from "merkle-json/index.js";
 import { StateLog } from '../index.js';
 import { Monitor } from '../node.js';
+import { logger } from 'log-instance';
 
-async function sleep(seconds) {
-  let ms = Math.round(seconds * 1000);
+async function sleep(ms) {
   return new Promise((resolve,reject)=>{
     setTimeout(()=>resolve(), ms);
   });
 }
+
+logger.logLevel = 'warn';
 
 typeof describe === "function" && describe("monitor", function(){
   let ml = new MerkleJson();
@@ -24,21 +26,23 @@ typeof describe === "function" && describe("monitor", function(){
     mon.terminate(); // IMPORTANT!!!
   })
   it("monitorUrl() ", async()=>{
-    let interval = 1000;
+    let interval = 350;
     let mon = new Monitor({interval});
     let url = "http://worldtimeapi.org/api/timezone/America/Los_Angeles";
-    let properties = {
-      abbrevation: undefined,
-      client_ip: undefined,
-      day_of_year: undefined,
-      datetime: {
-        exclude: ":.*",
-      },
+    let jsonFilter = {
+      abbreviation: true,
+      client_ip: true,
+      datetime: '^[-0-9T]+:[0-9]+',
     }
-    mon.monitorUrl({url, properties});
-    console.log("hi");
-    await sleep(5);
-    console.log("bye");
+    let probe = mon.monitorUrl({url, jsonFilter});
+    await sleep(5*interval);
+    should(probe).properties({url, jsonFilter});
+    let { stateLog } = probe;
+    should(stateLog).properties({ age: 4, interval, });
+    should(stateLog.state.status).equal(200);
+    should.deepEqual(
+      Object.keys(stateLog.state.json), 
+      Object.keys(jsonFilter));
 
     mon.terminate(); // IMPORTANT!!!
   });

@@ -60,37 +60,62 @@ export class Monitor {
     logger.info(msg, `@ ${interval/1000}s`);
   }
 
-  async #timerHandler() {
+  #timerHandler() {
     const msg = CLASS+'.timerHandler() ';
     let { probes } = this;
+    let date = new Date();
+    let errorHandler = (e)=>{
+      let state = {
+        error:e.message,
+        message: 'could not fetch json',
+      }
+    }
+
     for (let i=0; i < probes.length; i++) {
-      let { stateLog, url } = probes[i];
-      //let res = await fetch(url);
-      console.log(msg, url, ); //res.status);
+      let { jsonFilter, stateLog, url } = probes[i];
+      fetch(url).then(res=>{
+        let { status } = res;
+        if (jsonFilter) {
+          res.json().then(json=>{
+            json = StateLog.normalizeState(json, jsonFilter);
+            let state = { status, json, };
+            stateLog.update(state, date);
+          }).catch(errorHandler);
+        } else {
+          let state = { status };
+          stateLog.update(state, date);
+        }
+      }).catch(errorHandler);
     }
   }
 
+  /**
+   * Add a probe to monitor the given url
+   * @param {url} url - resource to monitor
+   * @param {StateLogProperties} jsonFilter - expect JSON response (see properties for StateLog.normalizeState()). If omitted, just record the status code.
+   */
   monitorUrl(opts={}) {
     const msg = CLASS+'.monitorUrl() ';
     let { probes, interval } = this;
     let {
       url,
-      properties,
+      jsonFilter,
     } = opts;
 
     if (probes.find(e=>e.url === url)) {
       throw new Error(`${msg} duplicate URL monitor ${url}`);
     }
 
-    let stateLog = new StateLog({ interval, properties });
+    let stateLog = new StateLog({ interval });
     let probe = { 
       stateLog, 
       url, 
+      jsonFilter,
     };
     probes.push(probe);
     logger.info(msg, url);
 
-    return this;
+    return probe;
   }
 
 }

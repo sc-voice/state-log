@@ -12,6 +12,7 @@ typeof describe === "function" && describe("state-log", ()=>{
       hash: ml.hash(undefined),
       age: 1,
     });
+    should(sl.date).instanceOf(Date);
     let dt = Date.now() - sl.date;
     should(dt).above(-1).below(15); // default timestamp
     should.deepEqual(sl.history, []);
@@ -207,11 +208,24 @@ typeof describe === "function" && describe("state-log", ()=>{
   it("TESTTESTnormalizeState()", ()=>{
     let date = JSON.stringify(new Date()).replace(/"/g,'');
     let keepMinutes = "[-T0-9]+:[0-9]+";
+    let color = 'blue';
+    let age = 25;
+    let rawState = {date, color, age};
+    let properties = {
+      date: keepMinutes,
+      color: true,
+    }
+
+    let normalizedState = StateLog.normalizeState(rawState, properties);
     let re = new RegExp(keepMinutes);
     let [ match, index ] = date.match(re);
-    should(re.test(date)).equal(true);
-    let expected = date.split(/:[.0-9]*Z$/)[0];
-    should(match).equal(expected);
-    //console.log({date, match, expected});
+    let expectedDate = date.split(/:[.0-9]*Z$/)[0];
+    should.deepEqual(normalizedState, {
+      date: expectedDate,
+      color
+    });
+
+    let unfilteredState = StateLog.normalizeState(rawState);
+    should.deepEqual(unfilteredState, rawState);
   });
 })
