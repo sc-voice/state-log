@@ -25,7 +25,6 @@
   },
   "scripts": {
     "build": "jsdoc src/*",
-    "install": "scripts/install",
     "gh-pages": "scripts/gh-pages.sh",
     "test": "npm run test:verbose",
     "test:test": "mocha --config test/mocha-config.json -g TESTTEST",
