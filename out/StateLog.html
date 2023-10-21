@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>StateLog<span class="signature">(interval, date, state, history, hash, age)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>StateLog<span class="signature">(interval, properties, date, state, history, hash, age)</span><span class="type-signature"></span></h2>
         
             <div class="class-description">Class for periodically logging state changes</div>
         
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="StateLog"><span class="type-signature"></span>new StateLog<span class="signature">(interval, date, state, history, hash, age)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="StateLog"><span class="type-signature"></span>new StateLog<span class="signature">(interval, properties, date, state, history, hash, age)</span><span class="type-signature"></span></h4>
     
 
     
@@ -107,6 +107,29 @@ Create a StateLog from its serialized JSON representation.
             
 
             <td class="description last">REQUIRED: sampling period in millisecods (default 1000)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>properties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">StateLogProperties</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">see normalizeState()</td>
         </tr>
 
     
@@ -426,7 +449,7 @@ Create a StateLog from its serialized JSON representation.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="state-log.js.html">state-log.js</a>, <a href="state-log.js.html#line90">line 90</a>
+        <a href="state-log.js.html">state-log.js</a>, <a href="state-log.js.html#line150">line 150</a>
     </li></ul></dd>
     
 
@@ -598,7 +621,7 @@ Create a StateLog from its serialized JSON representation.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="state-log.js.html">state-log.js</a>, <a href="state-log.js.html#line107">line 107</a>
+        <a href="state-log.js.html">state-log.js</a>, <a href="state-log.js.html#line167">line 167</a>
     </li></ul></dd>
     
 
@@ -647,6 +670,9 @@ For proper synchronization, update the StateLog
 at the interval defined for the StateLog.
 The given date doesn't need to be exact,
 but it should "reasonably close".
+For historical accuracy, the given dates must not deviate
+from ideal "no-lag" update intervals by less than
+one interval.
 </div>
 
 
@@ -762,7 +788,7 @@ but it should "reasonably close".
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="state-log.js.html">state-log.js</a>, <a href="state-log.js.html#line58">line 58</a>
+        <a href="state-log.js.html">state-log.js</a>, <a href="state-log.js.html#line117">line 117</a>
     </li></ul></dd>
     
 
@@ -793,6 +819,198 @@ but it should "reasonably close".
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id=".normalizeState"><span class="type-signature">(static) </span>normalizeState<span class="signature">(state, properties)</span><span class="type-signature"> &rarr; {serializable}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Normalize given state for storage.
+Normalization can remove unwanted properties.
+Normalization can also trim property values.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">serializable</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">raw state to be normalized</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>properties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">StateLogProperties</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">normalization parameters.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="state-log.js.html">state-log.js</a>, <a href="state-log.js.html#line72">line 72</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    normalized object
+
+If properties.xyz is true, that property is included.
+If properties.xyz is a string, 
+the string is converted to a regular expression and
+the state value of that property is stripped of 
+anything that does not matchthat regular expression.
+If properties.xyz is anything else an Error is thrown.
+If properties is null, the entire state is left as is.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">serializable</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
     
 
     
@@ -814,7 +1032,7 @@ but it should "reasonably close".
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Oct 20 2023 11:17:12 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Oct 20 2023 17:19:02 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

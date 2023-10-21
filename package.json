@@ -24,7 +24,7 @@
     "should": "^13.2.3"
   },
   "scripts": {
-    "build": "scripts/build-dist.sh",
+    "build": "jsdoc src/*",
     "test": "npm run test:verbose",
     "test:test": "mocha --config test/mocha-config.json -g TESTTEST",
     "test:verbose": "mocha --inline-diffs",
