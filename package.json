@@ -26,6 +26,7 @@
   "scripts": {
     "build": "jsdoc src/*",
     "gh-pages": "scripts/gh-pages.sh",
+    "push-action": "scripts/push-action",
     "test": "npm run test:verbose",
     "test:test": "mocha --config test/mocha-config.json -g TESTTEST",
     "test:verbose": "mocha --inline-diffs",
