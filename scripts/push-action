@@ -12,7 +12,7 @@ echo -e "${SCRIPT}: updating dependencies..."
 npm install 
 
 cd $APPDIR
-jsdoc src/*
+npm run build
 npm run gh-pages
 
 echo -e "${SCRIPT}: END `date`"
