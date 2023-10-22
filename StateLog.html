@@ -30,7 +30,7 @@
     
         <h2><span class="attribs"><span class="type-signature"></span></span>StateLog<span class="signature">(interval, properties, date, state, history, hash, age)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Class for periodically logging state changes</div>
+            <div class="class-description"><p>Class for periodically logging state changes</p></div>
         
     
 </header>
@@ -53,8 +53,8 @@
 
 
 <div class="description">
-    Create a StateLog for a given interval.
-Create a StateLog from its serialized JSON representation.
+    <p>Create a StateLog for a given interval.
+Create a StateLog from its serialized JSON representation.</p>
 </div>
 
 
@@ -106,7 +106,7 @@ Create a StateLog from its serialized JSON representation.
 
             
 
-            <td class="description last">REQUIRED: sampling period in millisecods (default 1000)</td>
+            <td class="description last"><p>REQUIRED: sampling period in millisecods (default 1000)</p></td>
         </tr>
 
     
@@ -129,7 +129,7 @@ Create a StateLog from its serialized JSON representation.
 
             
 
-            <td class="description last">see normalizeState()</td>
+            <td class="description last"><p>see normalizeState()</p></td>
         </tr>
 
     
@@ -152,7 +152,7 @@ Create a StateLog from its serialized JSON representation.
 
             
 
-            <td class="description last">JSON: current sample date</td>
+            <td class="description last"><p>JSON: current sample date</p></td>
         </tr>
 
     
@@ -175,7 +175,7 @@ Create a StateLog from its serialized JSON representation.
 
             
 
-            <td class="description last">JSON: sample state</td>
+            <td class="description last"><p>JSON: sample state</p></td>
         </tr>
 
     
@@ -198,7 +198,7 @@ Create a StateLog from its serialized JSON representation.
 
             
 
-            <td class="description last">JSON: past states</td>
+            <td class="description last"><p>JSON: past states</p></td>
         </tr>
 
     
@@ -221,7 +221,7 @@ Create a StateLog from its serialized JSON representation.
 
             
 
-            <td class="description last">JSON: Merkle hash of state</td>
+            <td class="description last"><p>JSON: Merkle hash of state</p></td>
         </tr>
 
     
@@ -244,7 +244,7 @@ Create a StateLog from its serialized JSON representation.
 
             
 
-            <td class="description last">JSON: state duration</td>
+            <td class="description last"><p>JSON: state duration</p></td>
         </tr>
 
     
@@ -356,7 +356,7 @@ Create a StateLog from its serialized JSON representation.
 
 
 <div class="description">
-    Return state at given date
+    <p>Return state at given date</p>
 </div>
 
 
@@ -493,7 +493,7 @@ Create a StateLog from its serialized JSON representation.
 
 
 <div class="description">
-    Returns array of states corresponding to given time period
+    <p>Returns array of states corresponding to given time period</p>
 </div>
 
 
@@ -553,7 +553,7 @@ Create a StateLog from its serialized JSON representation.
                 </td>
             
 
-            <td class="description last">number of intervals in historical period</td>
+            <td class="description last"><p>number of intervals in historical period</p></td>
         </tr>
 
     
@@ -580,7 +580,7 @@ Create a StateLog from its serialized JSON representation.
                 </td>
             
 
-            <td class="description last">history end date</td>
+            <td class="description last"><p>history end date</p></td>
         </tr>
 
     
@@ -665,14 +665,14 @@ Create a StateLog from its serialized JSON representation.
 
 
 <div class="description">
-    Update StateLog with new state for given date/time.
+    <p>Update StateLog with new state for given date/time.
 For proper synchronization, update the StateLog
 at the interval defined for the StateLog.
 The given date doesn't need to be exact,
-but it should "reasonably close".
+but it should &quot;reasonably close&quot;.
 For historical accuracy, the given dates must not deviate
-from ideal "no-lag" update intervals by less than
-one interval.
+from ideal &quot;no-lag&quot; update intervals by less than
+one interval.</p>
 </div>
 
 
@@ -724,7 +724,7 @@ one interval.
 
             
 
-            <td class="description last">state at given date</td>
+            <td class="description last"><p>state at given date</p></td>
         </tr>
 
     
@@ -747,7 +747,7 @@ one interval.
 
             
 
-            <td class="description last">date of given state</td>
+            <td class="description last"><p>date of given state</p></td>
         </tr>
 
     
@@ -832,9 +832,9 @@ one interval.
 
 
 <div class="description">
-    Normalize given state for storage.
+    <p>Normalize given state for storage.
 Normalization can remove unwanted properties.
-Normalization can also trim property values.
+Normalization can also trim property values.</p>
 </div>
 
 
@@ -886,7 +886,7 @@ Normalization can also trim property values.
 
             
 
-            <td class="description last">raw state to be normalized</td>
+            <td class="description last"><p>raw state to be normalized</p></td>
         </tr>
 
     
@@ -909,7 +909,7 @@ Normalization can also trim property values.
 
             
 
-            <td class="description last">normalization parameters.</td>
+            <td class="description last"><p>normalization parameters.</p></td>
         </tr>
 
     
@@ -979,15 +979,16 @@ Normalization can also trim property values.
 
         
 <div class="param-desc">
-    normalized object
-
-If properties.xyz is true, that property is included.
-If properties.xyz is a string, 
+    <p>normalized object</p>
+<ul>
+<li>If properties.xyz is true, that property is included.</li>
+<li>If properties.xyz is a string,
 the string is converted to a regular expression and
-the state value of that property is stripped of 
-anything that does not matchthat regular expression.
-If properties.xyz is anything else an Error is thrown.
-If properties is null, the entire state is left as is.
+the state value of that property is stripped of
+anything that does not matchthat regular expression.</li>
+<li>If properties.xyz is anything else an Error is thrown.</li>
+<li>If properties is null, the entire state is left as is.</li>
+</ul>
 </div>
 
 
@@ -1032,7 +1033,7 @@ If properties is null, the entire state is left as is.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Oct 21 2023 16:45:45 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun Oct 22 2023 00:15:53 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
