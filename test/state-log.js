@@ -34,7 +34,7 @@ typeof describe === "function" && describe("state-log", ()=>{
     let sl2 = new StateLog(json);
     should.deepEqual(sl2, sl);
   })
-  it("update()", ()=>{
+  it("TESTTESTupdate()", ()=>{
     let date = new Date(2000, 1,1);
     let interval = 10;
     let states = ['a', 'a', 'b', 'c'];
@@ -43,7 +43,11 @@ typeof describe === "function" && describe("state-log", ()=>{
     let iState = 0;
 
     // 'a'
-    let sl = new StateLog({date:dates[iState], state:states[iState]});
+    let sl = new StateLog({
+      interval,
+      date:dates[iState], 
+      state:states[iState],
+    });
     iState++;
 
     // 'a'
@@ -90,7 +94,10 @@ typeof describe === "function" && describe("state-log", ()=>{
     let date1b = new Date(date.getTime() + 1);
     let date1 = new Date(date.getTime() + interval);
     let date1a = new Date(date1.getTime() + 1);
-    let date5b = date1a;
+    let date2 = new Date(date1.getTime() + 2*interval);
+    let date3 = new Date(date1.getTime() + 3*interval);
+    let date4 = new Date(date1.getTime() + 4*interval);
+    let date5b = new Date(date4.getTime() + 1);
     let date5 = new Date(date.getTime() + 5*interval);
     let date5a = new Date(date5.getTime() + 1);
     let sl = new StateLog({interval, state:'a', date:date0});
@@ -112,7 +119,7 @@ typeof describe === "function" && describe("state-log", ()=>{
     should(sl.stateAt(date5)).equal('c');
     should(sl.stateAt(date5a)).equal('c');
   });
-  it("TESTTESTupdate() squash interval", ()=>{
+  it("update() squash interval", ()=>{
     let date = new Date(2000, 1,1);
     let interval = 1000;
     let states = ['a', 'a', 'b', 'c'];
@@ -205,7 +212,7 @@ typeof describe === "function" && describe("state-log", ()=>{
     should.deepEqual(sl.stateHistory(5), 
       ['z','z','z','z','z']);
   });
-  it("TESTTESTnormalizeState()", ()=>{
+  it("normalizeState()", ()=>{
     let date = JSON.stringify(new Date()).replace(/"/g,'');
     let keepMinutes = "[-T0-9]+:[0-9]+";
     let color = 'blue';

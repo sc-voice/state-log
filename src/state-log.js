@@ -8,13 +8,14 @@ export class StateLog {
    * Create a StateLog for a given interval.
    * Create a StateLog from its serialized JSON representation.
    * @param {object} opts - REQUIRED: named options
-   * @param {milliseconds} opts.interval - REQUIRED: sampling period in millisecods (default 1000)
+   * @param {milliseconds} opts.interval - REQUIRED: sampling period in millisecods (1000)
    * @param {StateLogProperties} opts.properties - see normalizeState() 
-   * @param {Date} opts.date - JSON: current sample date
-   * @param {JSON} opts.state - JSON: sample state
-   * @param {array} opts.history - JSON: past states
+   * @param {Date} opts.date - JSON: current sample state date (current Date)
+   * @param {JSON} opts.state - JSON: sample state (undefined)
+   * @param {array} opts.history - JSON: past states ([])
    * @param {guid} opts.hash - JSON: Merkle hash of state
-   * @param {numberOfIntervals} opts.age - JSON: state duration
+   * @param {numberOfIntervals} opts.age - JSON: state duration (1)
+   *
    */
   constructor(opts={}) {
     const msg = 'StateLog.ctor()';
@@ -106,14 +107,24 @@ export class StateLog {
    * Update StateLog with new state for given date/time.
    * For proper synchronization, update the StateLog
    * at the interval defined for the StateLog.
+   * 
+   * @param {serializable} newState - state at given date
+   * @param {Date} newDate - date of given state
+   *
+   * ### Syncronization
+   * It's important to keep updates synchronized to
+   * the expected intervals.
    * The given date doesn't need to be exact,
    * but it should "reasonably close".
    * For historical accuracy, the given dates must not deviate
    * from ideal "no-lag" update intervals by less than
    * one interval.
-   * 
-   * @param {serializable} newState - state at given date
-   * @param {Date} newDate - date of given state
+   * In particular, "known" state is only defined for
+   * the single interval ending with the update.
+   * Updates made after multiple intervals will
+   * therefore automatically result in the *undefined*
+   * state being logged for all the missing updates
+   * prior to the actual update.
    */
   update(newState, newDate=new Date()) {
     const msg = 'StateLog.update() ';
@@ -129,17 +140,24 @@ export class StateLog {
     let dAge = Math.max(1, dinterval);
     
     if (hash !== newHash) {
-      this.history.push({
-        age, 
-        state:this.state,
-      });
+      this.history.push({ age, state:this.state, });
+      if (dAge > 1) {
+        this.history.push({ age: dAge-1, state: undefined, });
+      }
       this.state = state;
       this.hash = newHash;
-      this.age = dAge;
+      this.age = 1;
     } else {
-      this.age += dAge;
+      if (dAge > 1) {
+        this.history.push({ age: dAge-1, state: undefined, });
+        this.age = 1;
+      } else {
+        this.age += dAge;
+      }
     }
-    this.date = newDate;
+
+    // NOTE: logged date is synchronized to interval date
+    this.date = new Date(date.getTime() + dAge * interval);
 
     return this;
   }
