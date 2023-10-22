@@ -7,13 +7,14 @@ export class StateLog {
   /**
    * Create a StateLog for a given interval.
    * Create a StateLog from its serialized JSON representation.
-   * @param {milliseconds} interval - REQUIRED: sampling period in millisecods (default 1000)
-   * @param {StateLogProperties} properties - see normalizeState() 
-   * @param {Date} date - JSON: current sample date
-   * @param {JSON} state - JSON: sample state
-   * @param {array} history - JSON: past states
-   * @param {guid} hash - JSON: Merkle hash of state
-   * @param {numberOfIntervals} age - JSON: state duration
+   * @param {object} opts - REQUIRED: named options
+   * @param {milliseconds} opts.interval - REQUIRED: sampling period in millisecods (default 1000)
+   * @param {StateLogProperties} opts.properties - see normalizeState() 
+   * @param {Date} opts.date - JSON: current sample date
+   * @param {JSON} opts.state - JSON: sample state
+   * @param {array} opts.history - JSON: past states
+   * @param {guid} opts.hash - JSON: Merkle hash of state
+   * @param {numberOfIntervals} opts.age - JSON: state duration
    */
   constructor(opts={}) {
     const msg = 'StateLog.ctor()';
