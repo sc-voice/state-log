@@ -141,23 +141,30 @@ export class StateLog {
     
     if (hash !== newHash) {
       this.history.push({ age, state:this.state, });
+    }
+
+    if (hash !== newHash) {
       if (dAge > 1) {
         this.history.push({ age: dAge-1, state: undefined, });
+        this.age = 1;
+        dAge = 1;
       }
       this.state = state;
       this.hash = newHash;
       this.age = 1;
     } else {
       if (dAge > 1) {
-        this.history.push({ age: dAge-1, state: undefined, });
+        this.history.push({ age: dAge-1, state: undefined });
         this.age = 1;
       } else {
         this.age += dAge;
       }
     }
 
-    // NOTE: logged date is synchronized to interval date
-    this.date = new Date(date.getTime() + dAge * interval);
+    // synchronized to interval date
+    // this.date = new Date(date.getTime() + dAge * interval);
+
+    this.date = newDate;
 
     return this;
   }
