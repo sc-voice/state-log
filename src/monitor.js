@@ -98,6 +98,11 @@ export class Monitor {
    * Add a probe to monitor the given url
    * @param {url} url - resource to monitor
    * @param {StateLogProperties} jsonFilter - expect JSON response (see properties for StateLog.normalizeState()). If omitted, just record the status code. If null, record entire state.
+   * @returns {Probe} probe
+   *
+   * * _probe.url_ the URL being probed
+   * * _probe.jsonFilter_ see jsonFilter parameter
+   * * _probe.stateLog_ StateLog instance
    */
   probeUrl(opts={}) {
     const msg = CLASS+'.probeUrl() ';
