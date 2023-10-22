@@ -24,7 +24,7 @@
     "should": "^13.2.3"
   },
   "scripts": {
-    "build": "jsdoc src/*",
+    "build": "jsdoc -c jsdoc-config.json src/*",
     "gh-pages": "scripts/gh-pages.sh",
     "push-action": "scripts/push-action",
     "test": "npm run test:verbose",
