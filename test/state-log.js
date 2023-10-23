@@ -86,39 +86,6 @@ typeof describe === "function" && describe("state-log", ()=>{
     should(sl.update('now')).equal(sl);
     should(Date.now()-sl.date.getTime()).above(-1).below(15);
   });
-  it("update() skip interval", ()=>{
-    let interval = 10;
-    let date = new Date(2000, 1,1);
-    let date0b = new Date(date.getTime() - 1);
-    let date0 = date;
-    let date1b = new Date(date.getTime() + 1);
-    let date1 = new Date(date.getTime() + interval);
-    let date1a = new Date(date1.getTime() + 1);
-    let date2 = new Date(date1.getTime() + 2*interval);
-    let date3 = new Date(date1.getTime() + 3*interval);
-    let date4 = new Date(date1.getTime() + 4*interval);
-    let date5b = new Date(date4.getTime() + 1);
-    let date5 = new Date(date.getTime() + 5*interval);
-    let date5a = new Date(date5.getTime() + 1);
-    let sl = new StateLog({interval, state:'a', date:date0});
-
-    // on interval
-    sl.update('b', date1);
-    should(sl.stateAt(date0)).equal('a');
-    should(sl.stateAt(date1b)).equal('b');
-    should(sl.stateAt(date1)).equal('b');
-    should(sl.stateAt(date1a)).equal('b');
-
-    // off interval
-    sl.update('c', date5);
-    should(sl.stateAt(date0b)).equal('a');
-    should(sl.stateAt(date0)).equal('a');
-    should(sl.stateAt(date1b)).equal('b');
-    should(sl.stateAt(date1)).equal('b');
-    should(sl.stateAt(date5b)).equal('c');
-    should(sl.stateAt(date5)).equal('c');
-    should(sl.stateAt(date5a)).equal('c');
-  });
   it("update() squash interval", ()=>{
     let date = new Date(2000, 1,1);
     let interval = 1000;
@@ -144,73 +111,6 @@ typeof describe === "function" && describe("state-log", ()=>{
     });
 
     should.deepEqual(slLag, slTrue);
-  });
-  it("stateAt()", ()=>{
-    let interval = 1000;
-    let date0b = new Date(2000, 1, 1);
-    let date0 = new Date(2000, 1, 2);
-    let date_a1 = new Date(date0.getTime() + 1*interval);
-    let date_a2 = new Date(date0.getTime() + 2*interval);
-    let date_b = new Date(date0.getTime() + 3*interval);
-    let date_cb = new Date(date_b.getTime() + 1);
-    let date_c = new Date(date0.getTime() + 4*interval);
-    let states = ['a', 'a', 'b', 'c'];
-    let sl = new StateLog({interval, state:'initial', date:date0});
-    states.forEach((state,i)=>{
-      let d = new Date(date0.getTime() + (i+1)*interval);
-      sl.update(state, d);
-    });
-
-    // state before creation is assumed to be same as initial
-    should(sl.stateAt(date0b)).equal('initial');
-    should(sl.stateAt(new Date(1000))).equal('initial');
-
-    // creation
-    should(sl.stateAt(date0)).equal('initial');
-
-    should(sl.stateAt(date_a1)).equal('a');
-    should(sl.stateAt(date_a2)).equal('a');
-    should(sl.stateAt(date_b)).equal('b');
-    should(sl.stateAt(date_cb)).equal('c');
-    should(sl.stateAt(date_c)).equal('c');
-
-    // state is assumed to be unchanged since last update
-    should(sl.stateAt()).equal('c');
-    should(sl.stateAt(new Date())).equal('c');
-  });
-  it("stateHistory()", ()=>{
-    let interval = 1000;
-    let date0b = new Date(2000, 1, 1);
-    let date0 = new Date(2000, 1, 2);
-    let date_x1 = new Date(date0.getTime() + 1*interval);
-    let date_x2 = new Date(date0.getTime() + 2*interval);
-    let date_y = new Date(date0.getTime() + 3*interval);
-    let date_zb = new Date(date_y.getTime() + 1);
-    let date_z = new Date(date0.getTime() + 4*interval);
-    let states = ['x', 'x', 'y', 'z'];
-    let sl = new StateLog({interval, state:'initial', date:date0});
-    states.forEach((state,i)=>{
-      let d = new Date(date0.getTime() + (i+1)*interval);
-      sl.update(state, d);
-    });
-
-    should.deepEqual(sl.stateHistory(1, date_x1), ['x']);
-    should.deepEqual(sl.stateHistory(1, date_x2), ['x']);
-    should.deepEqual(sl.stateHistory(1, date_y), ['y']);
-    should.deepEqual(sl.stateHistory(1, date_z), ['z']);
-
-    should.deepEqual(sl.stateHistory(5, date0), 
-      ['initial', 'initial', 'initial','initial','initial']);
-    should.deepEqual(sl.stateHistory(5, date_x1), 
-      ['initial', 'initial', 'initial','initial','x']);
-    should.deepEqual(sl.stateHistory(5, date_y), 
-      ['initial', 'initial', 'x','x','y']);
-    should.deepEqual(sl.stateHistory(5, date_zb), 
-      ['initial', 'x','x','y', 'z']);
-    should.deepEqual(sl.stateHistory(5, date_z), 
-      ['initial', 'x','x','y', 'z']);
-    should.deepEqual(sl.stateHistory(5), 
-      ['z','z','z','z','z']);
   });
   it("normalizeState()", ()=>{
     let date = JSON.stringify(new Date()).replace(/"/g,'');

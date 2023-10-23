@@ -200,41 +200,6 @@ export class StateLog {
   }
 
   /**
-   * Return state at given date
-   * @param {Date} aDate
-   */
-  stateAt(aDate=new Date()) {
-    const msg = 'StateLog.stateAt() ';
-    let { interval, age, history, date, state:result } = this;
-    let curDate = new Date(date.getTime() - interval*age + 1);
-    for (let i=history.length-1; aDate < curDate && i>=0; i--) {
-      let { age, state } = history[i];
-      result = state;
-      curDate = new Date(curDate.getTime() - interval*age);
-    }
-    return result;
-  }
-
-  /**
-   * Returns array of states corresponding to given time period
-   * @param {int} intervals - number of intervals in historical period
-   * @param {Date} endDate - history end date 
-   */
-  stateHistory(intervals=1, endDate=new Date()) {
-    const msg = 'StateLog.stateHistory() ';
-    let history = [];
-    let date = endDate;
-    let { interval } = this;
-
-    while (intervals-- > 0) {
-      let state = this.stateAt(date);
-      history.push(state);
-      date = new Date(date.getTime() - interval);
-    }
-    return history.reverse();
-  }
-
-  /**
    * Generate an iterator over logged states
    * @param {object} opts - options
    * @param {Date} opts.endDate - do not show states older than endDate
