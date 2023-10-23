@@ -235,63 +235,6 @@ typeof describe === "function" && describe("state-log", ()=>{
     let unfilteredState = StateLog.normalizeState(rawState);
     should.deepEqual(unfilteredState, rawState);
   });
-  it("stateIterator()", ()=>{
-    let interval = 10;
-    let date_0 = new Date(2000, 1,1);
-    let dates = [0,1,2,3,4,5]
-      .map(t=>new Date(date_0.getTime()+t*interval));
-    let sl = new StateLog({ interval, state:'initial', date:dates[1]});
-    let expected = [{ // 0
-      age_ms: 10,
-      state: 'initial',
-      startDate: new Date(dates[0].getTime() - 0*interval + 1),
-    },{ // 1
-      age_ms: 10,
-      state: 'a',
-      startDate: new Date(dates[1].getTime() + 1),
-    },{ // 2
-      age_ms: 20,
-      state: undefined,
-      startDate: new Date(dates[2].getTime() + 1),
-    },{ // 3
-      age_ms: 10,
-      state: 'b',
-      startDate: new Date(dates[4].getTime() + 1),
-    }];
-    let testIterator = (iter, done, value)=>{
-      let res = iter.next();
-      should(res.done).equal(done);
-      if (value) {
-        should(res.value).properties(value);
-      } else {
-        should(res.value).equal(value);
-      }
-    }
-
-    let iter_0 = sl.stateIterator();
-    sl.update('a', dates[2]);
-    let iter_a = sl.stateIterator();
-    sl.update('b', dates[5]);  // logging gap
-    let iter_b = sl.stateIterator();
-
-    // iterators can be used after additional logging
-    testIterator(iter_0, false, expected[0]); // initial
-    testIterator(iter_0, true, undefined);
-    testIterator(iter_0, true, undefined);
-
-    testIterator(iter_a, false, expected[1]); // a
-    testIterator(iter_a, false, expected[0]); // initial
-    testIterator(iter_a, true, undefined);
-    testIterator(iter_a, true, undefined);
-
-    // iterator included logging gap
-    testIterator(iter_b, false, expected[3]); // b
-    testIterator(iter_b, false, expected[2]); // undefined
-    testIterator(iter_b, false, expected[1]); // a
-    testIterator(iter_b, false, expected[0]); // initial
-    testIterator(iter_b, true, undefined);
-    testIterator(iter_b, true, undefined);
-  });
   it("TESTTESTstateGenerator()", ()=>{
     let interval = 10;
     let date_0 = new Date(2000, 1,1);
@@ -300,19 +243,19 @@ typeof describe === "function" && describe("state-log", ()=>{
     let sl = new StateLog({ interval, state:'initial', date:dates[1]});
     let expected = [{ // 0 age_ms: 10,
       state: 'initial',
-      startDate: new Date(dates[0].getTime() - 0*interval + 1),
+      date: dates[1],
     },{ // 1
       age_ms: 10,
       state: 'a',
-      startDate: new Date(dates[1].getTime() + 1),
+      date: dates[2],
     },{ // 2
       age_ms: 20,
       state: undefined,
-      startDate: new Date(dates[2].getTime() + 1),
+      date: dates[4],
     },{ // 3
       age_ms: 10,
       state: 'b',
-      startDate: new Date(dates[4].getTime() + 1),
+      date: dates[5],
     }];
     let testIterator = (iter, done, value)=>{
       let res = iter.next();

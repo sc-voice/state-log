@@ -235,52 +235,11 @@ export class StateLog {
   }
 
   /**
-   * Create an iterator over logged states
+   * Generate an iterator over logged states
    * @param {object} opts - options
    * @param {Date} opts.endDate - do not show states older than endDate
    * @returns {Iterator} 
    */
-  stateIterator(opts={}) {
-    const msg = 'StateLog.stateIterator() ';
-    let { history, interval, date, age, state } = this;
-    let { endDate } = opts;
-    let length = history.length;
-    let age_ms = age * interval;
-    let startDate = new Date(date.getTime() - age_ms + 1);
-    let iHistory = length;
-
-    return {
-      next: ()=>{
-        if (iHistory === length) {
-          iHistory--;
-          return { 
-            done:false, 
-            value: {
-              age_ms, 
-              startDate, 
-              state,
-            }
-          };
-        }
-        if (0 <= iHistory) {
-          let hist = history[iHistory];
-          let age_ms = hist.age * interval;
-          startDate = new Date(startDate.getTime() - age_ms);
-          iHistory--;
-          return {
-            done: false,
-            value: {
-              age_ms: hist.age * interval,
-              state: hist.state,
-              startDate,
-            }
-          }
-        }
-        return { done: true }
-      }
-    }
-  }
-
   stateGenerator(opts={}) {
     const msg = 'StateLog.stateGenerator() ';
     let { history, interval, date, age, state } = this;
@@ -295,19 +254,20 @@ export class StateLog {
         iHistory--;
         yield  {
           age_ms, 
-          startDate, 
+          date, 
           state,
         }
       }
      while (0 <= iHistory && (!endDate || endDate < startDate)) {
         let hist = history[iHistory];
         let age_ms = hist.age * interval;
+        let date = new Date(startDate.getTime() - 1);
         startDate = new Date(startDate.getTime() - age_ms);
         iHistory--;
         yield {
           age_ms: hist.age * interval,
           state: hist.state,
-          startDate,
+          date,
         }
       }
     })();
