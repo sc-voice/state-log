@@ -1,7 +1,37 @@
 import { MerkleJson } from "merkle-json/index.js"
 
 /**
- * Class for periodically logging state changes
+ * StateLog is a logger that uses a compact JSON data representation
+ * for applications requiring periodic logging.
+ * StateLog instances only grow when state changes.
+ * 
+ * ### Discrete Time Axis
+ * StateLog relies on an infinite discrete time axis to log 
+ * periodic events separated by a client-defined interval. 
+ * The client must therefore provide exactly one state update 
+ * for each interval. Logged states increases in age until
+ * they change. State change is determined by a Merkle tree hash.
+ * The default state is *undefined*.
+ *
+ * ### Syncronization
+ * Synchronization of updates is a responsibility shared between
+ * client and StateLog. The client is responsible for periodic
+ * logging--StateLog is NOT designed for intermittent ad-hoc logging.
+ * Although periodic logging is required, strict adherence to 
+ * discrete time points is not required. StateLog will deduce the
+ * discrete time point correspoinding to each update.
+ * Clients should therefore be aware that the time of any logged event
+ * is at the granularity of the logging interval, not the actual
+ * time of the event. Updates made at the beginning of an interval
+ * will have the *same discrete timestamp* as updates made at the
+ * end of an interval.
+ * 
+ * Because discrete time points are used for logging, StateLog 
+ * will handle delayed logging provided the delay does not
+ * exceed a full interval.  * In addition, it is impossible to 
+ * sustain periodic logging indefinitely, so StateLog will handle 
+ * this simply by* adding an *undefined* state to span the 
+ * logging gap.
  */
 export class StateLog {
   /**
@@ -202,5 +232,59 @@ export class StateLog {
       date = new Date(date.getTime() - interval);
     }
     return history.reverse();
+  }
+
+  /**
+   * Returns array of states corresponding to given time period
+   * @param {int} intervals - number of intervals in historical period
+   * @param {Date} endDate - history end date 
+   */
+  stateIterator() {
+    const msg = 'StateLog.stateIterator() ';
+    let { history, interval, date, age, state } = this;
+    let length = history.length;
+    let age_ms = age * interval;
+    let startDate = new Date(date.getTime() - age_ms + 1);
+    let iHistory = length;
+
+    return {
+      next: ()=>{
+        if (iHistory === length) {
+          iHistory--;
+          return { 
+            done:false, 
+            value: {
+              age_ms, 
+              startDate, 
+              state,
+            }
+          };
+        }
+        if (0 <= iHistory) {
+          let hist = history[iHistory];
+          let age_ms = hist.age * interval;
+          startDate = new Date(startDate.getTime() - age_ms);
+          iHistory--;
+          return {
+            done: false,
+            value: {
+              age_ms: hist.age * interval,
+              state: hist.state,
+              startDate,
+            }
+          }
+        }
+        return { done: true }
+      }
+    }
+/*
+
+    while (intervals-- > 0) {
+      let state = this.stateAt(date);
+      history.push(state);
+      date = new Date(date.getTime() - interval);
+    }
+    return history.reverse();
+    */
   }
 }
