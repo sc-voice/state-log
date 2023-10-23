@@ -42,7 +42,7 @@ Here, we extract the HH:MM:S part of a given timestamp
 using StateLog normalization:
 
 ```
-scripts/test-url --json-filterf '{datetime:"T[^:]+:[^:]+:."}'
+scripts/test-url --json-filter '{datetime:"T[^:]+:[^:]+:."}'
 
 ```
 
