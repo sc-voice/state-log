@@ -4,9 +4,8 @@ import { logger } from 'log-instance';
 import fs from 'fs';
 import JSON5 from 'json5';
 
-const DEFAULT_SERVER = "https://www.api.sc-voice.net/scv";
 const DEFAULT_URL = 
-  `${DEFAULT_SERVER}/play/segment/thig1.1/en/soma/thig1.1%3A1.1/Amy`;
+  "http://worldtimeapi.org/api/timezone/America/Los_Angeles";
 
 const [ NODE_PATH, SCRIPT_PATH, ...args ] = process.argv;
 const SCRIPT_NAME = SCRIPT_PATH.split('/').pop();

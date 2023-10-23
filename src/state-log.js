@@ -91,14 +91,15 @@ export class StateLog {
    * Normalization can also trim property values. 
    * @param {serializable} state - raw state to be normalized
    * @param {StateLogProperties} properties - normalization parameters. 
-   * @returns {serializable} normalized object
    *
-   * * If properties.xyz is true, that property is included.
+   * @returns {serializable} normalized object as defined by:
+   * * If properties.xyz is true, that property is included 
+   * in normalized state.
    * * If properties.xyz is a string, 
    * the string is converted to a regular expression and
    * the state value of that property is stripped of 
-   * anything that does not matchthat regular expression.
-   * * If properties.xyz is anything else an Error is thrown.
+   * anything that does not match that regular expression.
+   * * If properties.xyz is anything else, an Error is thrown.
    * * If properties is null, the entire state is left as is.
    */
   static normalizeState(state, properties) {
