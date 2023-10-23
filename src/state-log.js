@@ -21,17 +21,18 @@ import { MerkleJson } from "merkle-json/index.js"
  * discrete time points is not required. StateLog will deduce the
  * discrete time point correspoinding to each update.
  * Clients should therefore be aware that the time of any logged event
- * is at the granularity of the logging interval, not the actual
+ * is recorded at the granularity of the logging interval, not the actual
  * time of the event. Updates made at the beginning of an interval
  * will have the *same discrete timestamp* as updates made at the
  * end of an interval.
  * 
  * Because discrete time points are used for logging, StateLog 
  * will handle delayed logging provided the delay does not
- * exceed a full interval.  * In addition, it is impossible to 
- * sustain periodic logging indefinitely, so StateLog will handle 
- * this simply by* adding an *undefined* state to span the 
- * logging gap.
+ * exceed a full interval. 
+ *
+ * Finally, if logging is interrupted for more than an interval,
+ * Statelog will automatically an *undefined* state for the duration
+ * of the logging gap as soon as the next update arrives.
  */
 export class StateLog {
   /**
@@ -45,7 +46,6 @@ export class StateLog {
    * @param {array} opts.history - JSON: past states ([])
    * @param {guid} opts.hash - JSON: Merkle hash of state
    * @param {numberOfIntervals} opts.age - JSON: state duration (1)
-   *
    */
   constructor(opts={}) {
     const msg = 'StateLog.ctor()';
@@ -140,21 +140,7 @@ export class StateLog {
    * 
    * @param {serializable} newState - state at given date
    * @param {Date} newDate - date of given state
-   *
-   * ### Syncronization
-   * It's important to keep updates synchronized to
-   * the expected intervals.
-   * The given date doesn't need to be exact,
-   * but it should "reasonably close".
-   * For historical accuracy, the given dates must not deviate
-   * from ideal "no-lag" update intervals by less than
-   * one interval.
-   * In particular, "known" state is only defined for
-   * the single interval ending with the update.
-   * Updates made after multiple intervals will
-   * therefore automatically result in the *undefined*
-   * state being logged for all the missing updates
-   * prior to the actual update.
+   * @returns this
    */
   update(newState, newDate=new Date()) {
     const msg = 'StateLog.update() ';
@@ -177,7 +163,6 @@ export class StateLog {
       if (dAge > 1) {
         this.history.push({ age: dAge-1, state: undefined, });
         this.age = 1;
-        dAge = 1;
       }
       this.state = state;
       this.hash = newHash;
@@ -192,9 +177,9 @@ export class StateLog {
     }
 
     // synchronized to interval date
-    // this.date = new Date(date.getTime() + dAge * interval);
+    let syncDate = new Date(date.getTime() + dAge * interval);
 
-    this.date = newDate;
+    this.date = syncDate;
 
     return this;
   }

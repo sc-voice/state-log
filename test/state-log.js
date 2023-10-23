@@ -82,9 +82,6 @@ typeof describe === "function" && describe("state-log", ()=>{
       date: dates[iState],
     });
     iState++;
-
-    should(sl.update('now')).equal(sl);
-    should(Date.now()-sl.date.getTime()).above(-1).below(15);
   });
   it("update() squash interval", ()=>{
     let date = new Date(2000, 1,1);
