@@ -271,7 +271,7 @@ typeof describe === "function" && describe("state-log", ()=>{
     let iter_0 = sl.stateIterator();
     sl.update('a', dates[2]);
     let iter_a = sl.stateIterator();
-    sl.update('b', dates[5]);
+    sl.update('b', dates[5]);  // logging gap
     let iter_b = sl.stateIterator();
 
     // iterators can be used after additional logging
@@ -284,13 +284,12 @@ typeof describe === "function" && describe("state-log", ()=>{
     testIterator(iter_a, true, undefined);
     testIterator(iter_a, true, undefined);
 
+    // iterator included logging gap
     testIterator(iter_b, false, expected[3]); // b
     testIterator(iter_b, false, expected[2]); // undefined
     testIterator(iter_b, false, expected[1]); // a
     testIterator(iter_b, false, expected[0]); // initial
     testIterator(iter_b, true, undefined);
     testIterator(iter_b, true, undefined);
-
-    console.log(sl, dates);
   });
 })
