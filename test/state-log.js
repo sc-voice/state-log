@@ -235,7 +235,7 @@ typeof describe === "function" && describe("state-log", ()=>{
     let unfilteredState = StateLog.normalizeState(rawState);
     should.deepEqual(unfilteredState, rawState);
   });
-  it("TESTTESTstateIterator()", ()=>{
+  it("stateIterator()", ()=>{
     let interval = 10;
     let date_0 = new Date(2000, 1,1);
     let dates = [0,1,2,3,4,5]
@@ -291,5 +291,84 @@ typeof describe === "function" && describe("state-log", ()=>{
     testIterator(iter_b, false, expected[0]); // initial
     testIterator(iter_b, true, undefined);
     testIterator(iter_b, true, undefined);
+  });
+  it("TESTTESTstateGenerator()", ()=>{
+    let interval = 10;
+    let date_0 = new Date(2000, 1,1);
+    let dates = [0,1,2,3,4,5]
+      .map(t=>new Date(date_0.getTime()+t*interval));
+    let sl = new StateLog({ interval, state:'initial', date:dates[1]});
+    let expected = [{ // 0 age_ms: 10,
+      state: 'initial',
+      startDate: new Date(dates[0].getTime() - 0*interval + 1),
+    },{ // 1
+      age_ms: 10,
+      state: 'a',
+      startDate: new Date(dates[1].getTime() + 1),
+    },{ // 2
+      age_ms: 20,
+      state: undefined,
+      startDate: new Date(dates[2].getTime() + 1),
+    },{ // 3
+      age_ms: 10,
+      state: 'b',
+      startDate: new Date(dates[4].getTime() + 1),
+    }];
+    let testIterator = (iter, done, value)=>{
+      let res = iter.next();
+      if (value) {
+        should(res.value).properties(value);
+      } else {
+        should(res.value).equal(value);
+      }
+      should(res.done).equal(done);
+    }
+
+    let iter_0 = sl.stateGenerator();
+    sl.update('a', dates[2]);
+    let iter_a = sl.stateGenerator();
+    sl.update('b', dates[5]);  // logging gap
+    let iter_b = sl.stateGenerator();
+    let iter_end3 = sl.stateGenerator({endDate: dates[3]});
+    let iter_end4 = sl.stateGenerator({endDate: dates[4]});
+
+    // iterators can be used after additional logging
+    testIterator(iter_0, false, expected[0]); // initial
+    testIterator(iter_0, true, undefined);
+    testIterator(iter_0, true, undefined);
+
+    testIterator(iter_a, false, expected[1]); // a
+    testIterator(iter_a, false, expected[0]); // initial
+    testIterator(iter_a, true, undefined);
+    testIterator(iter_a, true, undefined);
+
+    // iterator included logging gap
+    testIterator(iter_b, false, expected[3]); // b
+    testIterator(iter_b, false, expected[2]); // undefined
+    testIterator(iter_b, false, expected[1]); // a
+    testIterator(iter_b, false, expected[0]); // initial
+    testIterator(iter_b, true, undefined);
+    testIterator(iter_b, true, undefined);
+
+    // iterator with endDate
+    testIterator(iter_end3, false, expected[3]); // b [5]
+    testIterator(iter_end3, false, expected[2]); // undefined [3,4]
+    //testIterator(iter_end3, false, expected[1]); // a [2]
+    //testIterator(iter_end3, false, expected[0]); // initial [1]
+    testIterator(iter_end3, true, undefined);
+    testIterator(iter_end3, true, undefined);
+
+    testIterator(iter_end4, false, expected[3]); // b [5]
+    testIterator(iter_end4, false, expected[2]); // undefined [3,4]
+    //testIterator(iter_end4, false, expected[1]); // a [2]
+    //testIterator(iter_end4, false, expected[0]); // initial [1]
+    testIterator(iter_end4, true, undefined);
+    testIterator(iter_end4, true, undefined);
+
+    let list = [];
+    for (let item of sl.stateGenerator()) {
+      list.push(item.state);
+    }
+    should.deepEqual(list, [ 'b', undefined, 'a', 'initial' ]);
   });
 })

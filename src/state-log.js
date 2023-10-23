@@ -235,13 +235,15 @@ export class StateLog {
   }
 
   /**
-   * Returns array of states corresponding to given time period
-   * @param {int} intervals - number of intervals in historical period
-   * @param {Date} endDate - history end date 
+   * Create an iterator over logged states
+   * @param {object} opts - options
+   * @param {Date} opts.endDate - do not show states older than endDate
+   * @returns {Iterator} 
    */
-  stateIterator() {
+  stateIterator(opts={}) {
     const msg = 'StateLog.stateIterator() ';
     let { history, interval, date, age, state } = this;
+    let { endDate } = opts;
     let length = history.length;
     let age_ms = age * interval;
     let startDate = new Date(date.getTime() - age_ms + 1);
@@ -277,14 +279,38 @@ export class StateLog {
         return { done: true }
       }
     }
-/*
-
-    while (intervals-- > 0) {
-      let state = this.stateAt(date);
-      history.push(state);
-      date = new Date(date.getTime() - interval);
-    }
-    return history.reverse();
-    */
   }
+
+  stateGenerator(opts={}) {
+    const msg = 'StateLog.stateGenerator() ';
+    let { history, interval, date, age, state } = this;
+    let { endDate } = opts;
+    let length = history.length;
+    let age_ms = age * interval;
+    let startDate = new Date(date.getTime() - age_ms + 1);
+    let iHistory = length;
+
+    return (function* () {
+      if (iHistory === length) {
+        iHistory--;
+        yield  {
+          age_ms, 
+          startDate, 
+          state,
+        }
+      }
+     while (0 <= iHistory && (!endDate || endDate < startDate)) {
+        let hist = history[iHistory];
+        let age_ms = hist.age * interval;
+        startDate = new Date(startDate.getTime() - age_ms);
+        iHistory--;
+        yield {
+          age_ms: hist.age * interval,
+          state: hist.state,
+          startDate,
+        }
+      }
+    })();
+  }
+
 }
