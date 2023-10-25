@@ -1,4 +1,5 @@
 import { StateLog } from './state-log.js';
+import { logger } from 'log-instance';
 
 /**
  * Probe a single URL and log the JSON results
@@ -31,6 +32,32 @@ export class UrlProbe {
     }
 
     Object.assign(this, {url, type, jsonFilter, stateLog });
+  }
+
+  /**
+   * fetch with timeout
+   * @param {URL} url - as for fetch()
+   * @param {fetchOptions} opts - as for fetch()
+   * @param {milliseconds} opts.timeout - required timeout (1000)
+   */
+  static async fetch(url, opts={}) {
+    const msg = 'UrlProbe.fetch()';
+    let { signal, timeout = 1000 } = opts;
+    let fetchOpts = Object.assign({}, opts);
+    let res;
+
+    try {
+      if (signal == null) {
+        fetchOpts.signal = AbortSignal.timeout( timeout );
+        delete fetchOpts.timeout;
+      }
+      res = await fetch(url, fetchOpts)
+    } catch(e){
+      logger.warn(msg, url, '=>', e.message);
+      throw e;
+    }
+
+    return res;
   }
 
   /**
@@ -89,18 +116,19 @@ export class UrlProbe {
    * @param {Date} date - logging date (vs. result date)
    */
   async probe(date = new Date()) {
+    const msg = 'UrlProbe.probe()';
     let { jsonFilter, stateLog, url } = this;
     let errorHandler = (e)=>{
       let state = {
-        error:e.message,
-        message: 'could not fetch json',
+        error: e.message,
+        message: `${msg} could not fetch json`,
       }
       stateLog.update(state, date);
     }
 
     let res;
     try {
-      res = await fetch(url);
+      res = await UrlProbe.fetch(url);
       let { status } = res;
       if (jsonFilter !== undefined) {
         let json = await res.json();

@@ -109,7 +109,7 @@ typeof describe === "function" && describe("state-log", ()=>{
 
     should.deepEqual(slLag, slTrue);
   });
-  it("TESTTESTstateGenerator()", ()=>{
+  it("stateGenerator()", ()=>{
     let interval = 10;
     let date_0 = new Date(2000, 1,1);
     let dates = [0,1,2,3,4,5]

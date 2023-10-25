@@ -4,7 +4,14 @@ import { StateLog, UrlProbe } from '../index.js';
 const TESTURL = 
   "http://worldtimeapi.org/api/timezone/America/Los_Angeles";
 
-typeof describe === "function" && describe("url-probe", ()=>{
+async function nap(ms) {
+  return new Promise((resolve,reject)=>{
+    setTimeout(()=>resolve(), ms);
+  });
+}
+
+typeof describe === "function" && describe("url-probe", function(){
+  this.timeout(10*1000);
   it("default ctor", ()=>{
     let eCaught;
     try {
@@ -69,5 +76,21 @@ typeof describe === "function" && describe("url-probe", ()=>{
 
     let unfilteredState = UrlProbe.normalizeState(rawState);
     should.deepEqual(unfilteredState, rawState);
+  });
+  it("TESTTESTfetch({timeout})", async()=>{
+    let url = "http://www.api.sc-voice.net:1234/scv/nowhere";
+    let timeout = 500;
+    let msStart = Date.now();
+    let eCaught = undefined;
+    try {
+      let res = await UrlProbe.fetch(url, {timeout});
+      //console.log("TESTTEST", res.status);
+    } catch(e) {
+      eCaught = e;
+    }
+    let msElapsed = Date.now() - msStart;
+    should(msElapsed).above(timeout-1);
+    should(eCaught.message).match(/timeout/i);
+    //console.log("TESTTEST", {msElapsed, eCaught});
   });
 })
