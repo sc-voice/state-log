@@ -109,29 +109,6 @@ typeof describe === "function" && describe("state-log", ()=>{
 
     should.deepEqual(slLag, slTrue);
   });
-  it("normalizeState()", ()=>{
-    let date = JSON.stringify(new Date()).replace(/"/g,'');
-    let keepMinutes = "[-T0-9]+:[0-9]+";
-    let color = 'blue';
-    let age = 25;
-    let rawState = {date, color, age};
-    let properties = {
-      date: keepMinutes,
-      color: true,
-    }
-
-    let normalizedState = StateLog.normalizeState(rawState, properties);
-    let re = new RegExp(keepMinutes);
-    let [ match, index ] = date.match(re);
-    let expectedDate = date.split(/:[.0-9]*Z$/)[0];
-    should.deepEqual(normalizedState, {
-      date: expectedDate,
-      color
-    });
-
-    let unfilteredState = StateLog.normalizeState(rawState);
-    should.deepEqual(unfilteredState, rawState);
-  });
   it("TESTTESTstateGenerator()", ()=>{
     let interval = 10;
     let date_0 = new Date(2000, 1,1);

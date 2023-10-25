@@ -40,7 +40,6 @@ export class StateLog {
    * Create a StateLog from its serialized JSON representation.
    * @param {object} opts - REQUIRED: named options
    * @param {milliseconds} opts.interval - REQUIRED: sampling period in millisecods (1000)
-   * @param {StateLogProperties} opts.properties - see normalizeState() 
    * @param {Date} opts.date - JSON: current sample state date (current Date)
    * @param {JSON} opts.state - JSON: sample state (undefined)
    * @param {array} opts.history - JSON: past states ([])
@@ -59,7 +58,6 @@ export class StateLog {
       history,
       hash,
       age=1,
-      properties,
     } = opts;
 
     if (history == null) {
@@ -69,11 +67,6 @@ export class StateLog {
       date = new Date(date);
     }
 
-    if (properties && Object.keys(properties).length===0) {
-      let eMsg = `${msg} properties argument has no keys`;
-      throw new Error(eMsg);
-    }
-
     let ml = new MerkleJson();
     Object.defineProperty(this, "ml", {
       value: ml,
@@ -81,57 +74,8 @@ export class StateLog {
     hash = hash || ml.hash(state);
 
     Object.assign(this, {
-      interval, date, state, history, hash, age, properties,
+      interval, date, state, history, hash, age, 
     });
-  }
-
-  /**
-   * Normalize given state for storage.
-   * Normalization can remove unwanted properties.
-   * Normalization can also trim property values. 
-   * @param {serializable} state - raw state to be normalized
-   * @param {StateLogProperties} properties - normalization parameters. 
-   *
-   * @returns {serializable} normalized object as defined by:
-   * * If properties.xyz is true, that property is included 
-   * in normalized state.
-   * * If properties.xyz is a string, 
-   * the string is converted to a regular expression and
-   * the state value of that property is stripped of 
-   * anything that does not match that regular expression.
-   * * If properties.xyz is anything else, an Error is thrown.
-   * * If properties is null, the entire state is left as is.
-   */
-  static normalizeState(state, properties) {
-    const msg = `StateLog.normalizeState()`;
-
-    if (properties == null) {
-      return state; 
-    }
-
-    if (typeof state === "object") {
-      let normalized = {};
-      Object.entries(properties).forEach(entry=>{
-        let [ key, value ] = entry;
-        let stateValue = state[key];
-
-        if (value === true) {
-          normalized[key] = stateValue;
-        } else if (typeof value === 'string') {
-          let re = new RegExp(value);
-          if (stateValue != null) {
-            let match = stateValue.match(re);
-            normalized[key] = match ? match[0] : 'no-match';
-          }
-        } else {
-          let emsg = `${msg} cannot normalize "${key}"`;
-          console.log({entry, value, key, normalized});
-          throw new Error(emsg);
-        }
-      });
-      state = normalized;
-    }
-    return state;
   }
 
   /**
@@ -145,8 +89,8 @@ export class StateLog {
    */
   update(newState, newDate=new Date()) {
     const msg = 'StateLog.update() ';
-    let { interval, age, ml, hash, date, properties } = this;
-    let state = StateLog.normalizeState(newState, properties);
+    let { interval, age, ml, hash, date, } = this;
+    let state = newState;
     let newHash = ml.hash(state);
     if (newDate < date) {
       let emsg = `${msg} newDate must be after ${date}`;

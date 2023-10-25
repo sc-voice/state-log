@@ -1,4 +1,5 @@
 import { StateLog } from "./state-log.js"
+import { UrlProbe } from "./url-probe.js"
 import { logger } from "log-instance"
 
 const CLASS = 'Monitor';
@@ -69,35 +70,16 @@ export class Monitor {
     const msg = CLASS+'.timerHandler() ';
     let { probes } = this;
     let date = new Date();
-    let errorHandler = (e)=>{
-      let state = {
-        error:e.message,
-        message: 'could not fetch json',
-      }
-    }
 
     for (let i=0; i < probes.length; i++) {
-      let { jsonFilter, stateLog, url } = probes[i];
-      fetch(url).then(res=>{
-        let { status } = res;
-        if (jsonFilter !== undefined) {
-          res.json().then(json=>{
-            json = StateLog.normalizeState(json, jsonFilter);
-            let state = { status, json, };
-            stateLog.update(state, date);
-          }).catch(errorHandler);
-        } else {
-          let state = { status };
-          stateLog.update(state, date);
-        }
-      }).catch(errorHandler);
+      probes[i].probe(date);
     }
   }
 
   /**
    * Add a probe to monitor the given url
    * @param {url} url - resource to monitor
-   * @param {StateLogProperties} jsonFilter - expect JSON response (see properties for StateLog.normalizeState()). If omitted, just record the status code. If null, record entire state.
+   * @param {JsonFilter} jsonFilter - expect JSON response (see properties for UrlProbe.normalizeState()). If omitted, just record the status code. If null, record entire state.
    * @returns {Probe} probe
    *
    * * _probe.url_ the URL being probed
@@ -117,11 +99,11 @@ export class Monitor {
     }
 
     let stateLog = new StateLog({ interval });
-    let probe = { 
+    let probe = new UrlProbe({ 
       stateLog, 
       url, 
       jsonFilter,
-    };
+    });
     probes.push(probe);
     this.info(msg, url);
 
