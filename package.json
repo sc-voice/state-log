@@ -2,7 +2,7 @@
   "name": "@sc-voice/state-log",
   "type": "module",
   "version": "1.0.0",
-  "description": "Compressed state logger",
+  "description": "Differential state logger",
   "exports": "./index.js",
   "engines": ">=18.18.2",
   "private": false,
@@ -42,6 +42,7 @@
   "bin": {},
   "keywords": [
     "Merkle compression",
+    "differential logger",
     "JSON state logging"
   ],
   "author": "Karl Lew",
