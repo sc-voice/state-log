@@ -2,7 +2,6 @@ import { StateLog } from "./state-log.js"
 import { UrlProbe } from "./url-probe.js"
 import { logger } from "log-instance"
 
-const CLASS = 'Monitor';
 const TIMER_INTERVAL = 60 * 1000;
 
 var timers = {};
@@ -14,30 +13,28 @@ var timers = {};
  */
 export class Monitor { 
   /**
-   * Create a monitof for a time interval
-   * @param {interval} monitoring period (milliseconds)
+   * Create a monitof for a time interval.
+
+   * @param {MonitorOptions} opts
+   * @param {milliseconds} opts.interval - monitoring period (1000)
    */
   constructor(opts={}) {
-    const msg = CLASS+'.ctor() ';
+    const msg = 'Monitor.ctor() ';
     let {
       interval = TIMER_INTERVAL, // milliseconds
     } = opts;
     logger.logInstance(this);
 
-    Object.defineProperty(this, "probes", {
-      value: [],
-    });
-    
-    Object.defineProperty(this, "interval", {
-      value: interval,
-    });
+    this.interval = interval;
+    this.started = undefined;
+    this.probes = [];
   }
 
   /**
    * Start monitor. Currently this can only be called once
    */
   start() {
-    const msg = CLASS+'.#start()';
+    const msg = 'Monitor.#start()';
     let { interval } = this;
     let timer = timers[interval];
     if (timer ) {
@@ -55,7 +52,7 @@ export class Monitor {
    * Stop monitoring and free up all resources.
    */
   stop() { 
-    const msg = CLASS+'.clear()';
+    const msg = 'Monitor.clear()';
     let { interval } = this;
     let timer = timers[interval];
     if (timer) {
@@ -63,11 +60,12 @@ export class Monitor {
       clearInterval(timer);
       timers[interval] = undefined;
     }
+    this.started = undefined;
     this.info(msg, 'monitor@${interval} is inactive');
   }
 
   #timerHandler() {
-    const msg = CLASS+'.timerHandler() ';
+    const msg = 'Monitor.timerHandler() ';
     let { probes } = this;
     let date = new Date();
 
@@ -87,11 +85,12 @@ export class Monitor {
    * * _probe.stateLog_ StateLog instance
    */
   probeUrl(opts={}) {
-    const msg = CLASS+'.probeUrl() ';
+    const msg = 'Monitor.probeUrl() ';
     let { probes, interval } = this;
     let {
       url,
       jsonFilter,
+      type,
     } = opts;
 
     if (probes.find(e=>e.url === url)) {
@@ -101,6 +100,7 @@ export class Monitor {
     let stateLog = new StateLog({ interval });
     let probe = new UrlProbe({ 
       stateLog, 
+      type,
       url, 
       jsonFilter,
     });

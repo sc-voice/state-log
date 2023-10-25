@@ -6,13 +6,20 @@ import { StateLog } from './state-log.js';
 export class UrlProbe {
   /**
    * Build a UrlProbe
-   * @param {URL} url - URL to probe
-   * @param {StateLog} stateLog - StateLog for recording probe result
-   * @param {object} jsonFilter - state normalization properties
+   * @param {UrlProbeOptions} opts
+   * @param {URL} opts.url - REQUIRED: URL to probe
+   * @param {StateLog} opts.stateLog - REQUIRED: probe result log 
+   * @param {object} opts.jsonFilter - state normalization properties (undefined)
+   * @param {String} opts.type - client type (heartbeat)
    */
   constructor(opts={}) {
     const msg = 'UrlProbe.ctor()';
-    let { url, stateLog, jsonFilter } = opts;
+    let { 
+      url, 
+      jsonFilter, 
+      type = "heartbeat",
+      stateLog, 
+    } = opts;
 
     try {
       new URL(url);
@@ -23,7 +30,7 @@ export class UrlProbe {
       throw new Error(`${msg} stateLog is required`);
     }
 
-    Object.assign(this, {url, stateLog, jsonFilter});
+    Object.assign(this, {url, type, jsonFilter, stateLog });
   }
 
   /**

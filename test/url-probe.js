@@ -16,15 +16,22 @@ typeof describe === "function" && describe("url-probe", ()=>{
   });
   it("custom ctor", async()=>{
     let url = TESTURL;
-    let jsonFilter = {datetime: true};
     let interval = 500;
     let date0 = new Date(2000, 1, 1);
     let date1 = new Date(date0.getTime() + interval);
     let stateLog = new StateLog({interval, date:date0});
-    let probe = new UrlProbe({url, jsonFilter, stateLog});
-    should(probe).properties({url, jsonFilter, stateLog});
+
+    let probe1 = new UrlProbe({
+      url, jsonFilter:undefined, stateLog, type:undefined});
+    should(probe1).properties({
+      url, jsonFilter:undefined, stateLog, type:'heartbeat'});
+
+    let jsonFilter = {datetime: true};
+    let type = "test-type";
+    let probe2 = new UrlProbe({ url, jsonFilter, stateLog, type});
+    should(probe2).properties({ url, jsonFilter, stateLog, type});
   });
-  it("probe", async()=>{
+  it("probe()", async()=>{
     let url = TESTURL;
     let jsonFilter = {datetime: true};
     let interval = 500;

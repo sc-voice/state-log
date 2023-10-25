@@ -19,16 +19,33 @@ typeof describe === "function" && describe("monitor", function(){
   it("default ctor", ()=>{
     let now = new Date();
     let mon = new Monitor();
-    should(mon.started).equal(undefined);
-
-    mon.start();
     should(mon).properties({
       interval: 60 * 1000,
+      probes: [],
+      started: undefined,
     });
-    mon.stop(); // IMPORTANT: release resources
+  });
+  it("start()", async()=>{
+    let now = new Date();
+    let mon = new Monitor();
 
+    mon.start();
+    should(mon.started).instanceOf(Date);
+    should(mon).properties({
+      interval: 60 * 1000,
+      probes: [],
+    });
+    should(mon.started).instanceOf(Date);
     should(mon.started - now).above(-1).below(10);
-  })
+
+    mon.stop(); // IMPORTANT: release resources
+    should(mon).properties({
+      interval: 60 * 1000,
+      probes: [],
+      started: undefined,
+    });
+
+  });
   it("probeUrl() ", async()=>{
     let interval = 350;
     let mon = new Monitor({interval});
