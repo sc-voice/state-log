@@ -115,10 +115,12 @@ let timer = setInterval(()=>{
 }, interval);
 
 if (seconds === 0) {
-  for (;;) {}
+  for (;;) {
+    await nap(1000);
+  }
+} else {
+  await nap(seconds * 1000);
+  clearInterval(timer);
+  monitor.stop();
 }
-
-await nap(seconds * 1000);
-clearInterval(timer);
-monitor.stop();
 
