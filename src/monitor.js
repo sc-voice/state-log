@@ -34,7 +34,7 @@ export class Monitor {
    * Start monitor. Currently this can only be called once
    */
   start() {
-    const msg = 'Monitor.#start()';
+    const msg = 'Monitor.start()';
     let { interval } = this;
     let timer = timers[interval];
     if (timer ) {
@@ -52,7 +52,7 @@ export class Monitor {
    * Stop monitoring and free up all resources.
    */
   stop() { 
-    const msg = 'Monitor.clear()';
+    const msg = 'Monitor.stop()';
     let { interval } = this;
     let timer = timers[interval];
     if (timer) {
