@@ -5,7 +5,7 @@
   "description": "Differential state logger",
   "exports": {
     ".": "./index.js",
-    "/node": "./node.js"
+    "./node": "./node.js"
   },
   "engines": ">=18.18.2",
   "private": false,
