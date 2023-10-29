@@ -44,7 +44,7 @@ DESCRIPTION
 
     -hp, --heartbeat-period PERIOD
         Repeat heartbeat output every PERIOD intervals of unchanged 
-        state.  If zero, do not emit heartbeat.
+        state.  If zero, do not emit heartbeat. Default is 10 seconds.
 
     -i, --interval PERIOD
         Repeat probe every PERIOD milliseconds. Default is 1000.
