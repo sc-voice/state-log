@@ -16,12 +16,12 @@ export class TestUrl {
       heartbeatPeriod = 10 ,
       interval = 1000,
       jsonFilter,
-      seconds = 60,
+      stop = 60,
       url = DEFAULT_URL,
     } = opts;
 
     Object.assign(this, {
-      logger, url, seconds, jsonFilter, heartbeatPeriod, interval,
+      logger, url, stop, jsonFilter, heartbeatPeriod, interval,
     });
   }
 
@@ -38,8 +38,8 @@ DESCRIPTION
         in server responses. If URL is not provided, environment URL
         is used. If enviroment URL is not provided, a known URL is used.
 
-    -s, --seconds SECONDS
-        Terminate program after given number of SECONDS. If SECONDS
+    -s, --stop SECONDS
+        Stop program after given number of SECONDS. If SECONDS
         is zero, repeat indefinitely.  Default for SECONDS is 60.
 
     -hp, --heartbeat-period PERIOD
@@ -58,9 +58,9 @@ DESCRIPTION
     for (let i=0; i < args.length; i++) {
       let arg = args[i];
       switch (arg) {
-        case '--seconds':
+        case '--stop':
         case '-s':
-          this.seconds = Number(args[++i]);
+          this.stop = Number(args[++i]);
           break;
         case '--heartbeat-period':
         case '-hp':
@@ -101,7 +101,7 @@ DESCRIPTION
 
   async monitor() {
     let { 
-      heartbeatPeriod, logger, interval, seconds, jsonFilter, url, 
+      heartbeatPeriod, logger, interval, stop, jsonFilter, url, 
     } = this;
     let monitor = new Monitor({interval});
     let probe = monitor.probeUrl({url, jsonFilter});
@@ -125,8 +125,8 @@ DESCRIPTION
       }
     }, interval);
 
-    if (seconds > 0) {
-      await nap(seconds * 1000);
+    if (stop > 0) {
+      await nap(stop * 1000);
       clearInterval(timer);
       monitor.stop();
     } else {

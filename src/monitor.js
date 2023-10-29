@@ -7,9 +7,9 @@ const TIMER_INTERVAL = 60 * 1000;
 var timers = {};
 
 /**
- * Class for monitoring server status.
- * Each instance defines the behavior for a particular 
- * monitoring interval.
+ * Monitor status of multiple resources at a fixed interval.
+ * All probes associated with a given monitoring instance
+ * are executed at the same interval.
  */
 export class Monitor { 
   /**
